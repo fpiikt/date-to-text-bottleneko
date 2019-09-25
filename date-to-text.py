@@ -7,43 +7,156 @@
 from datetime import datetime
 
 
-class DateToTextClass:
-    __DATETIME_FORMAT = "%d.%m.%Y %H:%M:%S"
+def generic_convert(tens, units, value):
+    maybe_result = units.get(value)
+    if maybe_result == None:
+        return tens[(value // 10) * 10] + " " + units[value % 10]
+    else:
+        return maybe_result
 
-    days = [
-        "",
-        "первое",
-        "второе",
-        "третье",
-        "четвертое",
-        "пятое",
-        "шестое",
-        "седьмое",
-        "восьмое",
-        "девятое",
-        "десятое",
-        "одиннадцатое",
-        "двенадцатое",
-        "тринадцатое",
-        "четырнадцатое",
-        "пятнадцатое",
-        "шестнадцатое",
-        "семнадцатое",
-        "восемнадцатое",
-        "девятнадцатое",
-        "двадцатое",
-        "двадцать первое",
-        "двадцать второе",
-        "двадцать третье",
-        "двадцать четвертое",
-        "двадцать пятое",
-        "двадцать шестое",
-        "двадцать седьмое",
-        "двадцать восьмое",
-        "двадцать девятое",
-        "тридцатое",
-        "тридцать первое"
-    ]
+class TimeToTextClass:
+    hours_units = dict([
+        (0, "ноль часов"),
+        (1, "один час"),
+        (2, "два часа"),
+        (3, "три часа"),
+        (4, "четыре часа"),
+        (5, "пять часов"),
+        (6, "шесть часов"),
+        (7, "семь часов"),
+        (8, "восемь часов"),
+        (9, "девять часов"),
+        (10, "десять часов"),
+        (11, "одиннадцать часов"),
+        (12, "двенадцать часов"),
+        (13, "тринадцать часов"),
+        (14, "четырнадцать часов"),
+        (15, "пятнадцать часов"),
+        (16, "шестнадцать часов"),
+        (17, "семнадцать часов"),
+        (18, "восемнадцать часов"),
+        (19, "девятнадцать часов"),
+        (20, "двадцать часов")
+    ])
+
+    hours_tens = dict([
+        (20, "двадцать")
+    ])
+
+    minutes_units = dict([
+        (0, "ноль минут"),
+        (1, "одна минута"),
+        (2, "две минуты"),
+        (3, "три минуты"),
+        (4, "четыре минуты"),
+        (5, "пять минут"),
+        (6, "шесть минут"),
+        (7, "семь минут"),
+        (8, "восемь минут"),
+        (9, "девять минут"),
+
+        (10, "десять минут"),
+        (11, "одиннадцать минут"),
+        (12, "двенадцать минут"),
+        (13, "тринадцать минут"),
+        (14, "четырнадцать минут"),
+        (15, "пятнадцать минут"),
+        (16, "шестнадцать минут"),
+        (17, "семнадцать минут"),
+        (18, "восемнадцать минут"),
+        (19, "девятнадцать минут"),
+
+        (20, "двадцать минут"),
+        (30, "тридцать минут"),
+        (40, "сорок минут"),
+        (50, "пятьдесят минут")
+    ])
+
+    minutes_tens = dict([
+        (20, "двадцать"),
+        (30, "тридцать"),
+        (40, "сорок"),
+        (50, "пятьдесят")
+    ])
+
+    seconds_units = dict([
+        (0, "ноль секунд"),
+        (1, "одна секунда"),
+        (2, "две секунды"),
+        (3, "три секунды"),
+        (4, "четыре секунды"),
+        (5, "пять секунд"),
+        (6, "шесть секунд"),
+        (7, "семь секунд"),
+        (8, "восемь секунд"),
+        (9, "девять секунд"),
+
+        (10, "десять секунд"),
+        (11, "одиннадцать секунд"),
+        (12, "двенадцать секунд"),
+        (13, "тринадцать секунд"),
+        (14, "четырнадцать секунд"),
+        (15, "пятнадцать секунд"),
+        (16, "шестнадцать секунд"),
+        (17, "семнадцать секунд"),
+        (18, "восемнадцать секунд"),
+        (19, "девятнадцать секунд"),
+
+        (20, "двадцать минут"),
+        (30, "тридцать минут"),
+        (40, "сорок минут"),
+        (50, "пятьдесят минут")
+    ])
+
+    seconds_tens = dict([
+        (20, "двадцать"),
+        (30, "тридцать"),
+        (40, "сорок"),
+        (50, "пятьдесят")
+    ])
+
+    __time = None
+
+    def __init__(self, time):
+        self.__time = time
+
+    def convert(self):
+        hours = generic_convert(self.hours_tens, self.hours_units, self.__time.hour)
+        minutes = generic_convert(self.minutes_tens, self.minutes_units, self.__time.minute)
+        seconds = generic_convert(self.seconds_tens, self.seconds_units, self.__time.second)
+
+        return "{} {} {}".format(hours, minutes, seconds)
+
+class DateToTextClass:
+    days_units = dict([
+        (0, ""),
+        (1, "первое"),
+        (2, "второе"),
+        (3, "третье"),
+        (4, "четвертое"),
+        (5, "пятое"),
+        (6, "шестое"),
+        (7, "седьмое"),
+        (8, "восьмое"),
+        (9, "девятое"),
+        (10, "десятое"),
+        (11, "одиннадцатое"),
+        (12, "двенадцатое"),
+        (13, "тринадцатое"),
+        (14, "четырнадцатое"),
+        (15, "пятнадцатое"),
+        (16, "шестнадцатое"),
+        (17, "семнадцатое"),
+        (18, "восемнадцатое"),
+        (19, "девятнадцатое"),
+        (20, "двадцатое"),
+        (30, "тридцатое")
+    ])
+
+    days_tens = dict([
+        (20, "двадцать"),
+        (30, "тридцать")
+    ])
 
     months = [
         "",
@@ -87,7 +200,7 @@ class DateToTextClass:
         "девятьсот"
     ]
 
-    units = dict([
+    years_units = dict([
         (1, "первого"),
         (2, "второго"),
         (3, "третьего"),
@@ -119,7 +232,7 @@ class DateToTextClass:
         (90, "девяностого")
     ])
 
-    tens = dict([
+    years_tens = dict([
         (20, "двацать"),
         (30, "тридцать"),
         (40, "сорок"),
@@ -130,153 +243,63 @@ class DateToTextClass:
         (90, "девяносто")
     ])
 
-    hours = [
-        "ноль часов",
-        "один час",
-        "два часа",
-        "три часа",
-        "четыре часа",
-        "пять часов",
-        "шесть часов",
-        "семь часов",
-        "восемь часов",
-        "девять часов",
-        "десять часов",
-        "одиннадцать часов",
-        "двенадцать часов",
-        "тринадцать часов",
-        "четырнадцать часов",
-        "пятнадцать часов",
-        "шестнадцать часов",
-        "семнадцать часов",
-        "восемнадцать часов",
-        "девятнадцать часов",
-        "двадцать часов",
-        "двадцать один час",
-        "двадцать два часа",
-        "двадцать три часа"
-    ]
+    __date = None
 
-    minutes = dict([
-        (0, "ноль минут"),
-        (1, "одна минута"),
-        (2, "две минуты"),
-        (3, "три минуты"),
-        (4, "четыре минуты"),
-        (5, "пять минут"),
-        (6, "шесть минут"),
-        (7, "семь минут"),
-        (8, "восемь минут"),
-        (9, "девять минут"),
+    def __init__(self, date):
+        self.__date = date
 
-        (10, "десять минут"),
-        (11, "одиннадцать минут"),
-        (12, "двенадцать минут"),
-        (13, "тринадцать минут"),
-        (14, "четырнадцать минут"),
-        (15, "пятнадцать минут"),
-        (16, "шестнадцать минут"),
-        (17, "семнадцать минут"),
-        (18, "восемнадцать минут"),
-        (19, "девятнадцать минут"),
+    def __convert_year(self):
+        year = self.__date.year
 
-        (20, "двадцать"),
-        (30, "тридцать"),
-        (40, "сорок"),
-        (50, "пятьдесят")
-    ])
+        thousands = self.thousands[year // 1000]
+        hundreds = self.hundreds[(year // 100) % 10]
+        tens_and_units = generic_convert(self.years_tens, self.years_units, year % 100)
 
-    seconds = dict([
-        (0, "ноль секунд"),
-        (1, "одна секунда"),
-        (2, "две секунды"),
-        (3, "три секунды"),
-        (4, "четыре секунды"),
-        (5, "пять секунд"),
-        (6, "шесть секунд"),
-        (7, "семь секунд"),
-        (8, "восемь секунд"),
-        (9, "девять секунд"),
+        words = [thousands, hundreds, tens_and_units]
 
-        (10, "десять секунд"),
-        (11, "одиннадцать секунд"),
-        (12, "двенадцать секунд"),
-        (13, "тринадцать секунд"),
-        (14, "четырнадцать секунд"),
-        (15, "пятнадцать секунд"),
-        (16, "шестнадцать секунд"),
-        (17, "семнадцать секунд"),
-        (18, "восемнадцать секунд"),
-        (19, "девятнадцать секунд"),
+        nonempty_words = filter(lambda x: len(x) > 0, words)
 
-        (20, "двадцать"),
-        (30, "тридцать"),
-        (40, "сорок"),
-        (50, "пятьдесят")
-    ])
+        return " ".join(nonempty_words)
+
+    def convert(self):
+        days = generic_convert(self.days_tens, self.days_units, self.__date.day)
+        months = self.months[self.__date.month]
+        years = self.__convert_year()
+
+        return  "{} {} {} года".format(days, months, years)
+
+class DateTimeToTextClass:
+    __DATETIME_FORMAT = "%d.%m.%Y %H:%M:%S"
 
     datetime = None
 
     def __init__(self, datetime_string):
         self.datetime = datetime.strptime(datetime_string, self.__DATETIME_FORMAT)
 
-    def __convert_year(self):
-        def convert_tens_and_units():
-            ten_or_unit = self.datetime.year % 100
-            maybe_result = self.units.get(ten_or_unit)
-            if maybe_result == None:
-                return self.tens[(ten_or_unit // 10) * 10] + " " + self.units[ten_or_unit % 10]
-            else:
-                return maybe_result
-
-        year = self.datetime.year
-        words = [self.thousands[year // 1000], self.hundreds[(year // 100) % 10], convert_tens_and_units()]
-
-        nonempty_words = filter(lambda x: len(x) > 0, words)
-
-        return " ".join(nonempty_words)
-
-    def __convert_date(self):
-        return self.days[self.datetime.day] + " " + self.months[self.datetime.month] + " " + self.__convert_year() + " года"
-
-    def __convert_time(self):
-        def convert_minutes(minute):
-            maybe_result = self.minutes.get(minute)
-            if maybe_result == None:
-                return self.minutes[(minute // 10) * 10] + " " + self.minutes[minute % 10]
-            else:
-                return maybe_result
-
-        def convert_seconds(minute):
-            maybe_result = self.seconds.get(minute)
-            if maybe_result == None:
-                return self.seconds[(minute // 10) * 10] + " " + self.seconds[minute % 10]
-            else:
-                return maybe_result
-
-        return self.hours[self.datetime.hour] + " " + convert_minutes(self.datetime.minute) + " " + convert_seconds(self.datetime.second)
-
     def convert(self):
-        return self.__convert_date() + " " + self.__convert_time()
+        date = DateToTextClass(self.datetime).convert()
+        time = TimeToTextClass(self.datetime).convert()
+
+        return "{} {}".format(date, time)
 
 def assert_equal(actual, expected):
     assert actual == expected, "Assertion failed.\nExpected value: {}\nActual value: {}".format(expected, actual)
 
 if __name__ == '__main__':
     assert_equal(
-        DateToTextClass('01.01.0001 00:00:00').convert(),
+        DateTimeToTextClass('01.01.0001 00:00:00').convert(),
         "первое января первого года ноль часов ноль минут ноль секунд"
     )
     assert_equal(
-        DateToTextClass('31.12.9999 23:59:59').convert(),
+        DateTimeToTextClass('31.12.9999 23:59:59').convert(),
         "тридцать первое декабря девять тысяч девятьсот девяносто девятого года двадцать три часа пятьдесят девять минут пятьдесят девять секунд"
     )
     assert_equal(
-        DateToTextClass('25.09.2019 08:17:59').convert(),
+        DateTimeToTextClass('25.09.2019 08:17:59').convert(),
         "двадцать пятое сентября две тысячи девятнадцатого года восемь часов семнадцать минут пятьдесят девять секунд"
     )
     assert_equal(
-        DateToTextClass('06.10.1990 23:45:06').convert(),
+        DateTimeToTextClass('06.10.1990 23:45:06').convert(),
         "шестое октября одна тысяча девятьсот девяностого года двадцать три часа сорок пять минут шесть секунд"
     )
     print("All test cases passed")
