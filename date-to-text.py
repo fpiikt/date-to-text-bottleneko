@@ -2,20 +2,49 @@
 
 """
   Автор: Мурашов Борис, группа №P3355
+
+  Поскольку в исходной задаче ограничений на год не указано, то будем
+  считать, что ограничения входных данных диктуются datetime
 """
 
 from datetime import datetime
 
 
+
 def generic_convert(tens, units, value):
+    """Перевод десятков и единиц по значению в строковую форму
+
+    tens  :: dict int string
+    unit  :: dict int string
+    value :: int
+
+    FIXME: по хорошему эта функция должна быть приватной функцией
+    классах TimeToTextClass и DateToTextClass ибо глобальное
+    использование подобной функции не годится на роль библиотечной
+    из-за ее специфичности именно для русского языка, но т.к:
+    * меньше кода - меньше проблем
+    * большая связность в задаче подобного размера роли не играет
+    * если бы требовалось разработать общий интерфейс для всех языков,
+    то архитектура была бы совершенно другой
+    * подобный код крайне редко подвергается редактированию
+
+    делаю вывод, что в данной реализации эта функция может находиться
+    тут
+    """
+    def ten(value):
+        return (value // 10) * 10
+
+    def unit(value):
+        return value % 10
+
     maybe_result = units.get(value)
     if maybe_result == None:
-        return tens[(value // 10) * 10] + " " + units[value % 10]
+        return tens[ten(value)] + " " + units[unit(value)]
     else:
         return maybe_result
 
 class TimeToTextClass:
-    hours_units = dict([
+    __hours_units = dict([
         (0, "ноль часов"),
         (1, "один час"),
         (2, "два часа"),
@@ -39,11 +68,11 @@ class TimeToTextClass:
         (20, "двадцать часов")
     ])
 
-    hours_tens = dict([
+    __hours_tens = dict([
         (20, "двадцать")
     ])
 
-    minutes_units = dict([
+    __minutes_units = dict([
         (0, "ноль минут"),
         (1, "одна минута"),
         (2, "две минуты"),
@@ -72,14 +101,14 @@ class TimeToTextClass:
         (50, "пятьдесят минут")
     ])
 
-    minutes_tens = dict([
+    __minutes_tens = dict([
         (20, "двадцать"),
         (30, "тридцать"),
         (40, "сорок"),
         (50, "пятьдесят")
     ])
 
-    seconds_units = dict([
+    __seconds_units = dict([
         (0, "ноль секунд"),
         (1, "одна секунда"),
         (2, "две секунды"),
@@ -108,7 +137,7 @@ class TimeToTextClass:
         (50, "пятьдесят минут")
     ])
 
-    seconds_tens = dict([
+    __seconds_tens = dict([
         (20, "двадцать"),
         (30, "тридцать"),
         (40, "сорок"),
@@ -118,17 +147,20 @@ class TimeToTextClass:
     __time = None
 
     def __init__(self, time):
+        """
+        time :: datetime
+        """
         self.__time = time
 
     def convert(self):
-        hours = generic_convert(self.hours_tens, self.hours_units, self.__time.hour)
-        minutes = generic_convert(self.minutes_tens, self.minutes_units, self.__time.minute)
-        seconds = generic_convert(self.seconds_tens, self.seconds_units, self.__time.second)
+        hours = generic_convert(self.__hours_tens, self.__hours_units, self.__time.hour)
+        minutes = generic_convert(self.__minutes_tens, self.__minutes_units, self.__time.minute)
+        seconds = generic_convert(self.__seconds_tens, self.__seconds_units, self.__time.second)
 
         return "{} {} {}".format(hours, minutes, seconds)
 
 class DateToTextClass:
-    days_units = dict([
+    __days_units = dict([
         (0, ""),
         (1, "первое"),
         (2, "второе"),
@@ -153,12 +185,12 @@ class DateToTextClass:
         (30, "тридцатое")
     ])
 
-    days_tens = dict([
+    __days_tens = dict([
         (20, "двадцать"),
         (30, "тридцать")
     ])
 
-    months = [
+    __months = [
         "",
         "января",
         "февраля",
@@ -174,7 +206,7 @@ class DateToTextClass:
         "декабря"
     ]
 
-    thousands = [
+    __thousands = [
         "",
         "одна тысяча",
         "две тысячи",
@@ -187,7 +219,7 @@ class DateToTextClass:
         "девять тысяч"
     ]
 
-    hundreds = [
+    __hundreds = [
         "",
         "сто",
         "двести",
@@ -200,7 +232,7 @@ class DateToTextClass:
         "девятьсот"
     ]
 
-    years_units = dict([
+    __years_units = dict([
         (1, "первого"),
         (2, "второго"),
         (3, "третьего"),
@@ -232,7 +264,7 @@ class DateToTextClass:
         (90, "девяностого")
     ])
 
-    years_tens = dict([
+    __years_tens = dict([
         (20, "двацать"),
         (30, "тридцать"),
         (40, "сорок"),
@@ -246,14 +278,26 @@ class DateToTextClass:
     __date = None
 
     def __init__(self, date):
+        """
+        date :: datetime
+        """
         self.__date = date
 
     def __convert_year(self):
+        def year_thousand(year):
+            return year // 1000
+
+        def year_hundred(year):
+            return (year // 100) % 10
+
+        def year_ten_and_unit(year):
+            return year % 100
+
         year = self.__date.year
 
-        thousands = self.thousands[year // 1000]
-        hundreds = self.hundreds[(year // 100) % 10]
-        tens_and_units = generic_convert(self.years_tens, self.years_units, year % 100)
+        thousands = self.__thousands[year_thousand(year)]
+        hundreds = self.__hundreds[year_hundred(year)]
+        tens_and_units = generic_convert(self.__years_tens, self.__years_units, year_ten_and_unit(year))
 
         words = [thousands, hundreds, tens_and_units]
 
@@ -262,8 +306,8 @@ class DateToTextClass:
         return " ".join(nonempty_words)
 
     def convert(self):
-        days = generic_convert(self.days_tens, self.days_units, self.__date.day)
-        months = self.months[self.__date.month]
+        days = generic_convert(self.__days_tens, self.__days_units, self.__date.day)
+        months = self.__months[self.__date.month]
         years = self.__convert_year()
 
         return  "{} {} {} года".format(days, months, years)
@@ -271,21 +315,37 @@ class DateToTextClass:
 class DateTimeToTextClass:
     __DATETIME_FORMAT = "%d.%m.%Y %H:%M:%S"
 
-    datetime = None
+    __datetime = None
 
     def __init__(self, datetime_string):
-        self.datetime = datetime.strptime(datetime_string, self.__DATETIME_FORMAT)
+        """
+        datetime_string :: string
+        """
+        self.__datetime = datetime.strptime(datetime_string, self.__DATETIME_FORMAT)
 
     def convert(self):
-        date = DateToTextClass(self.datetime).convert()
-        time = TimeToTextClass(self.datetime).convert()
+        date = DateToTextClass(self.__datetime).convert()
+        time = TimeToTextClass(self.__datetime).convert()
 
         return "{} {}".format(date, time)
 
 def assert_equal(actual, expected):
-    assert actual == expected, "Assertion failed.\nExpected value: {}\nActual value: {}".format(expected, actual)
+    assert actual == expected, "Assertion failed.\n"
+    "Expected value: {}\n"
+    "Actual value: {}".format(expected, actual)
+
+def assert_exception(function, arg, expected_exception):
+    try:
+        eval(function)(arg),
+    except Exception as e:
+        actual_exception = type(e).__name__
+        assert actual_exception == expected_exception, "Expected exception: {}\n"
+        "Actual except: {}".format(expected_exception, actual_exception)
 
 if __name__ == '__main__':
+    """
+    Тесты границ
+    """
     assert_equal(
         DateTimeToTextClass('01.01.0001 00:00:00').convert(),
         "первое января первого года ноль часов ноль минут ноль секунд"
@@ -294,6 +354,9 @@ if __name__ == '__main__':
         DateTimeToTextClass('31.12.9999 23:59:59').convert(),
         "тридцать первое декабря девять тысяч девятьсот девяносто девятого года двадцать три часа пятьдесят девять минут пятьдесят девять секунд"
     )
+    """
+    Тесты из условия задачи
+    """
     assert_equal(
         DateTimeToTextClass('25.09.2019 08:17:59').convert(),
         "двадцать пятое сентября две тысячи девятнадцатого года восемь часов семнадцать минут пятьдесят девять секунд"
@@ -301,5 +364,20 @@ if __name__ == '__main__':
     assert_equal(
         DateTimeToTextClass('06.10.1990 23:45:06').convert(),
         "шестое октября одна тысяча девятьсот девяностого года двадцать три часа сорок пять минут шесть секунд"
+    )
+    """
+    Тесты обработки некорректного ввода данных
+    """
+    assert_exception(
+        "DateTimeToTextClass", '25.09.0000 08:17:59',
+        "ValueError"
+    )
+    assert_exception(
+        "DateTimeToTextClass", '25.09.2019 25:17:59',
+        "ValueError"
+    )
+    assert_exception(
+        "DateTimeToTextClass", '25.09.10000 25:17:59',
+        "ValueError"
     )
     print("All test cases passed")
